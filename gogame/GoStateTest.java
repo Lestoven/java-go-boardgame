@@ -59,7 +59,7 @@ public class GoStateTest {
 		Point p = new Point(x, y);
 		state.placeStone(p); // placing the stone
 		assertAll(
-				() -> assertFalse(state.isLegalMove(p)), // Opponent player unable to place a stone again to a taken position
+				() -> assertFalse(state.isLegalMove(p)), // Opponent player unable to place a stone to a taken position
 				() -> assertFalse(state.isLegalMove(p))  // Same player unable to place a stone again to a taken position
 		);
 	}
