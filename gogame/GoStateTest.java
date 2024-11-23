@@ -427,7 +427,7 @@ public class GoStateTest {
 		
 		GoState readedState = GoState.loadGame(file);
 		assertAll(
-			() -> assertTrue(readedState.equals(originalState)), // this only checks the "board" and "turn" as the assignment required
+			() -> assertTrue(readedState.equals(originalState)), // this checks the "board" and "turn" fields, as the assignment required
 			() -> assertEquals(readedState.getBlackCaptured(), originalState.getBlackCaptured()),
 			() -> assertEquals(readedState.getWhiteCaptured(), originalState.getWhiteCaptured())
 		);		
