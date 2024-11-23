@@ -45,8 +45,7 @@ public final class GoState implements Predicate<Point>, Serializable {
 		blackCaptured = o.blackCaptured;
 		whiteCaptured = o.whiteCaptured;
 		turn = o.turn;
-		//prevStates = o.prevStates; // we won't change prevStates, so shallow copy is enough
-		prevStates = new HashSet<>(o.prevStates); // we won't modify prevStates "inside", so shallow copy is enough
+		prevStates = o.prevStates; // we won't change prevStates, so shallow copy is enough
 	}
 	
 	public Point[] getNeighbors(Point p) {

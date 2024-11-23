@@ -2,6 +2,7 @@ package gogame;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -60,8 +61,8 @@ public class GoStateTest {
 		Point p = new Point(x, y);
 		state.placeStone(p); // placing the stone
 		assertAll(
-				() -> assertFalse(state.isLegalMove(p)), // Opponent player unable to place a stone to a taken position
-				() -> assertFalse(state.isLegalMove(p))  // Same player unable to place a stone again to a taken position
+				() -> assertFalse(state.isLegalMove(p)), // Opponent player unable to place a stone on the taken position
+				() -> assertFalse(state.isLegalMove(p))  // Same player unable to place a stone again on the taken position
 		);
 	}
 	
@@ -147,7 +148,7 @@ public class GoStateTest {
 		state.makeMove(new Point(3, 1));
 		state.makeMove(new Point(1, 2));
 		state.makeMove(new Point(2, 2));  
-		state.makeMove(new Point(2, 1)); // The comment before the method display state until here, black stone placed to (2, 1)
+		state.makeMove(new Point(2, 1)); // The comment before this method displays the state here.
 		state.makeMove(new Point(1, 1)); // White stone placed to (1, 1), removing black stone at (2, 1) 
 		assertFalse(state.isLegalMove(new Point(2, 1))); // Would cause the same state as the comment shows, so it's illegal
 	}
@@ -213,7 +214,7 @@ public class GoStateTest {
 							int x = capturedPositions.get(i).x;
 							int y = capturedPositions.get(i).y;
 							assertEquals(BoardSpace.EMPTY, state.board[y][x], "Captured stone at position x: %d y: %d wasn't removed".formatted(x, y));
-						}) // check whether all encircled(captured) position is correctly handled (set to BoardSpace.EMPTY)
+					}) // check whether all encircled(captured) position is correctly handled (set to BoardSpace.EMPTY)
 			)
 		);
 	}
@@ -288,12 +289,12 @@ public class GoStateTest {
 	    return Stream.of(
 	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 0))), // move to already taken position
 	        Arguments.of(9, List.of(new Point(0, 0), new Point(-5, 0))), // move outside of the board's boundaries
-	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 0))) // suicidal move
-
+	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 0))), // suicidal move
+	        Arguments.of(19, List.of(new Point(18, 0), new Point(16, 9), new Point(2, 3), new  Point(18, 0))) // move to already taken position
 	    );
 	} // only the last move is illegal
 	
-	@DisplayName("Testing, that \"makeMove\" doesn't allow invalid moves (returns false, board not changing")
+	@DisplayName("Testing, that \"makeMove\" doesn't allow invalid moves (returns false, game state doesn't change)")
 	@ParameterizedTest
 	@MethodSource("provideIllegalMoveSequence")
 	public void testMakeMoveInvalidMove(int boardSize, List<Point> illegalMoveSequence) {
@@ -302,18 +303,98 @@ public class GoStateTest {
 			.limit(illegalMoveSequence.size() - 1)
 			.forEach(state::makeMove);
 		
-		var prevBoard = Arrays.stream(state.board)
-				.map(row -> row.clone())
-				.toArray(BoardSpace[][]::new);
-		boolean moveResult = state.makeMove(illegalMoveSequence.getLast()); // only the last move is illegal in the provided move sequence
+		var prevStatesBeforeIllegalMove = new HashSet<>(state.getPrevStates());
+		boolean illegalMoveResult = state.makeMove(illegalMoveSequence.getLast()); // only the last move is illegal in the provided move sequence
 		assertAll(
-				() -> assertFalse(moveResult), // makeMove returns false
-				() -> assertTrue(Arrays.deepEquals(prevBoard, state.board)) // board doesn't change
+				() -> assertFalse(illegalMoveResult), // makeMove returned false for the illegal move
+				() -> assertTrue(prevStatesBeforeIllegalMove.equals(state.getPrevStates())) // the game state is unchanged
+		);
+	}
+	
+	
+	static Stream<Arguments> provideValidMoveSequence() {
+	    return Stream.of(
+	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 4), new Point(6, 4))),
+	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 7), new Point(12, 7))),
+	        Arguments.of(19, List.of(new Point(18, 0), new Point(16, 9), new Point(2, 3), new  Point(18, 5), new Point(0, 0)))
+	    );
+	} // each move is legal
+	
+	@DisplayName("Testing, that \"makeMove\" handles valid moves correctly (prevStates, changed stone placed)")
+	@ParameterizedTest
+	@MethodSource("provideValidMoveSequence")
+	public void testMakeMoveValidMove(int boardSize, List<Point> validMoveSequence) {
+		GoState state = new GoState(boardSize);
+		
+		validMoveSequence.stream()
+			.forEach(pos -> {
+				var prevStatesBeforeMove = new HashSet<>(state.getPrevStates());
+				state.makeMove(pos); // valid move
+				assertAll(
+					() -> assertFalse(prevStatesBeforeMove.equals(state.getPrevStates())), // State changed
+					() -> assertTrue(state.board[pos.y][pos.x] != BoardSpace.EMPTY) // Stone placed
+				);
+		});
+	}
+	
+	
+	static Stream<Arguments> provideAlmostCapturedGoStates() {
+	    return Stream.of(
+	        Arguments.of("""
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,B,_,_,_,_,_
+	        	_,_,B,W,B,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	""", new Point(3, 3), Stone.BLACK, 1, 0),
+	        Arguments.of("""
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,W,_,_,_,_,_,_,_,_,_
+	        	_,_,W,B,W,_,_,_,_,_,_,_,_
+	        	_,_,W,B,_,W,_,_,_,_,_,_,_
+	        	_,_,W,W,W,W,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_,_,_,_,_
+	        	""", new Point(4, 4), Stone.WHITE, 0, 2),
+	        Arguments.of("""
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,_,_,_
+	        	_,_,_,_,_,_,B,W,B
+	        	_,_,_,_,_,_,B,W,W
+	        	_,_,_,_,_,_,B,W,W
+	        	""", new Point(7, 5), Stone.BLACK, 5, 0)
+	    );
+	}
+	@DisplayName("Testing, that \"makeMove\" handles captured stones correctly.")
+	@ParameterizedTest
+	@MethodSource("provideAlmostCapturedGoStates")
+	public void testMakeMoveCapturedStones(String gameState, Point capturingMove, Stone currentPlayerColor, int expectedBlackCaptured, int expcetedWhiteCaptured) {
+		GoState state = GoStateParser.parseGoState(gameState);
+		state.turn = currentPlayerColor;
+		state.makeMove(capturingMove); // encircle(capture) oppenent's stones
+		
+		assertAll(
+				() -> assertEquals(expectedBlackCaptured, state.getBlackCaptured()),
+				() -> assertEquals(expcetedWhiteCaptured, state.getWhiteCaptured())
 		);
 	}
 
+	
 	@Test
-	@Disabled
 	public void testSaveLoadGame() {
 		
 	}
