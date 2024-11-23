@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@DisplayName("Tests of the GoState")
 public class GoStateTest {
 	@DisplayName("Testing, that \"getNeighbors\" method returns the neighbors of a given point on the board.")
 	@ParameterizedTest(name = "Board size: {0}; Point: {1}")
@@ -145,10 +146,10 @@ public class GoStateTest {
 		state.makeMove(new Point(0, 1));
 		state.makeMove(new Point(3, 1));
 		state.makeMove(new Point(1, 2));
-		state.makeMove(new Point(2, 2)); // The comment before the method display state until here
-		state.makeMove(new Point(2, 1));
-		state.makeMove(new Point(1, 1));
-		assertFalse(state.isLegalMove(new Point(2, 1))); // Would cause the same state as 2 moves before
+		state.makeMove(new Point(2, 2));  
+		state.makeMove(new Point(2, 1)); // The comment before the method display state until here, black stone placed to (2, 1)
+		state.makeMove(new Point(1, 1)); // White stone placed to (1, 1), removing black stone at (2, 1) 
+		assertFalse(state.isLegalMove(new Point(2, 1))); // Would cause the same state as the comment shows, so it's illegal
 	}
 	
 	
@@ -259,14 +260,14 @@ public class GoStateTest {
 	@DisplayName("Testing, that \"getLiberties\" method finds the correct liberties, and the correct group of stones.")
 	@ParameterizedTest
 	@MethodSource("provideStatesForLibertyCheck")
-	public void testGetLiberties(String gameState, Point p, Stone playerColor, List<Point> expectedLiberties, Set<Point> expectedGroupPoints) {
+	public void testGetLiberties(String gameState, Point p, Stone playerColor, List<Point> expectedLiberties, Set<Point> expectedScannedPoints) {
 		GoState state = GoStateParser.parseGoState(gameState);
-		Set<Point> groupPoints = new HashSet<>();
-		Point[] liberties = state.getLiberties(playerColor, p, groupPoints);
+		Set<Point> scannedPoints = new HashSet<>();
+		Point[] liberties = state.getLiberties(playerColor, p, scannedPoints);
 		
 		assertAll(
 				() -> assertTrue(expectedLiberties.containsAll(Arrays.asList(liberties))),
-				() -> assertTrue(expectedGroupPoints.equals(groupPoints))
+				() -> assertTrue(expectedScannedPoints.equals(scannedPoints))
 		);
 	}
 	
@@ -274,7 +275,7 @@ public class GoStateTest {
 	@DisplayName("Testing, that \"makeMove\" correctly handles the end of the game (both player pass)")
 	@Test
 	public void testMakeMoveEndGame() {
-		GoState state = new GoState(9);
+		GoState state = new GoState(9); // boardSize here doesn't matter
 		
 		assertAll(
 				() -> assertFalse(state.makeMove(null)), // The first pass doesn't end the game 
@@ -285,8 +286,8 @@ public class GoStateTest {
 	
 	static Stream<Arguments> provideIllegalMoveSequence() {
 	    return Stream.of(
-	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 0))), // move to taken position
-	        Arguments.of(9, List.of(new Point(0, 0), new Point(-5, 0))), // move outside of board
+	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 0))), // move to already taken position
+	        Arguments.of(9, List.of(new Point(0, 0), new Point(-5, 0))), // move outside of the board's boundaries
 	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 0))) // suicidal move
 
 	    );

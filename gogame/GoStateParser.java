@@ -18,7 +18,7 @@ public class GoStateParser {
 		IntStream.range(0, lines.length)
 			.forEach(i -> {
 				 lines[i] = lines[i].replace(",", ""); // removing the commas
-				 IntStream.range(0, lines[i].length())
+				 IntStream.range(0, lines.length)
 					.forEach(j -> state.board[i][j] = parseLetter(lines[i].charAt(j)));
 			}); // parsing the GoState
 		return state;
