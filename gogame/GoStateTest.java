@@ -2,9 +2,9 @@ package gogame;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -394,8 +393,43 @@ public class GoStateTest {
 	}
 
 	
+	static Stream<Arguments> provideGoStates() {
+	    return Stream.of(
+	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 4), new Point(6, 4))),
+	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 7), new Point(12, 7))),
+	        Arguments.of(19, List.of(new Point(18, 0), new Point(16, 9), new Point(2, 3), new  Point(18, 5), new Point(0, 0)))
+	    );
+	}
+	
+
+	
+	/*
+	  _,W,_,_,_,_,_,_,_
+	  W,_,_,_,_,_,_,_,_
+	  _,_,B,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	  _,_,_,_,_,_,_,_,_
+	*/
 	@Test
 	public void testSaveLoadGame() {
+		GoState originalState = new GoState(9);
+		originalState.makeMove(new Point(0, 0));
+		originalState.makeMove(new Point(1, 0));
+		originalState.makeMove(new Point(2, 2));
+		originalState.makeMove(new Point(0, 1));
 		
+		File file = new File("testSerialization.go");
+		originalState.saveGame(file);
+		
+		GoState readedState = GoState.loadGame(file);
+		assertAll(
+			() -> assertTrue(readedState.equals(originalState)), // this only checks the "board" and "turn" as the assignment required
+			() -> assertEquals(readedState.getBlackCaptured(), originalState.getBlackCaptured()),
+			() -> assertEquals(readedState.getWhiteCaptured(), originalState.getWhiteCaptured())
+		);		
 	}
 }

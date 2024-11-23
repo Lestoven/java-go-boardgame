@@ -45,7 +45,7 @@ public final class GoState implements Predicate<Point>, Serializable {
 		blackCaptured = o.blackCaptured;
 		whiteCaptured = o.whiteCaptured;
 		turn = o.turn;
-		prevStates = o.prevStates; // we won't change prevStates, so shallow copy is enough
+		prevStates = o.prevStates; // we won't modify prevStates, so much better performance can be achieved if we don't copy unnecessarily
 	}
 	
 	public Point[] getNeighbors(Point p) {
@@ -71,7 +71,7 @@ public final class GoState implements Predicate<Point>, Serializable {
 			Arrays.stream(getNeighbors(currentPoint))
 				.filter(neighborPoint -> !discovered.contains(neighborPoint))
 				.forEach(neighborPoint -> { toScan.add(neighborPoint); discovered.add(neighborPoint); });
-		}; // expand the BFS, to search for additional liberties, and group members
+		}; // expand the BFS, to search for additional liberties, and group members (scanned)
 		
 		toScan.add(p); // add the starting point to the queue
 		
