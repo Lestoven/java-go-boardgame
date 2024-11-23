@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.util.Arrays;
@@ -417,19 +418,25 @@ public class GoStateTest {
 	@Test
 	public void testSaveLoadGame() {
 		GoState originalState = new GoState(9);
+		GoState readedState;
+		
 		originalState.makeMove(new Point(0, 0));
 		originalState.makeMove(new Point(1, 0));
 		originalState.makeMove(new Point(2, 2));
 		originalState.makeMove(new Point(0, 1));
 		
-		File file = new File("testSerialization.go");
-		originalState.saveGame(file);
-		
-		GoState readedState = GoState.loadGame(file);
-		assertAll(
-			() -> assertTrue(readedState.equals(originalState)), // this checks the "board" and "turn" fields, as the assignment required
-			() -> assertEquals(readedState.getBlackCaptured(), originalState.getBlackCaptured()),
-			() -> assertEquals(readedState.getWhiteCaptured(), originalState.getWhiteCaptured())
-		);		
+		try {
+			File file = new File("testSerialization.go");
+			originalState.saveGame(file);
+			
+			readedState = GoState.loadGame(file);
+			assertAll(
+				() -> assertTrue(readedState.equals(originalState)), // this checks the "board" and "turn" fields, as the assignment required
+				() -> assertEquals(readedState.getBlackCaptured(), originalState.getBlackCaptured()),
+				() -> assertEquals(readedState.getWhiteCaptured(), originalState.getWhiteCaptured())
+			);		
+		} catch (IllegalArgumentException ex) {
+			fail(ex.getMessage());
+		}
 	}
 }
