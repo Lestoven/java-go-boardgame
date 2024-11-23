@@ -134,6 +134,8 @@ public class GoPane extends JComponent implements MouseListener, MouseMotionList
 			return;
 		state.makeMove(new Point(e.getX() / pixelsPerSpace, e.getY() / pixelsPerSpace));
 		updateLabel.accept(state.toString());
+		
+		hover = null; // after clicking reset the hover
 		repaint();
 	}
 
