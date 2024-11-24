@@ -148,7 +148,7 @@ public class GoSwing {
 
 	public static void main(String[] args) {
 		var goFrame = GoFrame.make();
-
+		
 		goFrame.setupStyles();
 		goFrame.setupActions();
 		goFrame.frame().setVisible(true);
