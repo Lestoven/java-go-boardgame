@@ -153,7 +153,7 @@ public final class GoState implements Predicate<Point>, Serializable {
 	 * Helper method to return a BoardSpace by a Point, to reduce redundancy.
 	 * @param p A Point of the table.
 	 * @return The table's BoardSpace on the specified Point.
-	 */
+	*/
 	private BoardSpace getBoardSpace(Point p) {
 		return board[p.y][p.x];
 	}
