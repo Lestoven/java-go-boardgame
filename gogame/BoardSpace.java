@@ -9,6 +9,6 @@ public enum BoardSpace {
 	}
 	
 	public static BoardSpace fromStone(Stone stone) {
-		return Stone.BLACK == stone ? BoardSpace.BLACK : BoardSpace.WHITE;
+		return Stone.BLACK == stone ? BoardSpace.BLACK : (Stone.WHITE == stone ? BoardSpace.WHITE : BoardSpace.EMPTY);
 	}
 }
