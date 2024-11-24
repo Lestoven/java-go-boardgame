@@ -45,7 +45,7 @@ public final class GoState implements Predicate<Point>, Serializable {
 		blackCaptured = o.blackCaptured;
 		whiteCaptured = o.whiteCaptured;
 		turn = o.turn;
-		prevStates = o.prevStates; // we won't modify prevStates, so much better performance can be achieved if we don't copy unnecessarily
+		prevStates = o.prevStates; // Already stored "GoState"s inside prevStates won't change during the program, so much better performance can be achieved if we don't copy unnecessarily
 	}
 	
 	public Point[] getNeighbors(Point p) {
