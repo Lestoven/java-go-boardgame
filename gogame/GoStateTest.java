@@ -21,9 +21,9 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@DisplayName("Tests of the GoState")
+@DisplayName("GoState tests")
 public class GoStateTest {
-	@DisplayName("Testing, that \"getNeighbors\" method returns the neighbors of a given point on the board.")
+	@DisplayName("Testing, that \"getNeighbors\" method returns the actual neighbors of a given point on the board.")
 	@ParameterizedTest(name = "Board size: {0}; Point: {1}")
 	@ArgumentsSource(NeighborPointsArgumentProvider.class)
 	public void testGetNeighbors(int boardSize, Point inputPoint, List<Point> expectedNeighbors) {
@@ -117,7 +117,7 @@ public class GoStateTest {
 	        	""", new Point(3, 1), Stone.BLACK)
 	    );
 	}
-	@DisplayName("Testing, that \"isLegalMove\" doesn't allow suicidal move. (The group's \"liberty\" cannot become 0).")
+	@DisplayName("Testing, that \"isLegalMove\" method doesn't allow suicidal move (The group's \"liberty\" cannot become 0).")
 	@ParameterizedTest
 	@MethodSource("provideSuicidalGoStates")
 	public void testIsLegalMoveSuicidal(String gameState, Point suicidalMove, Stone currentPlayerColor) {
@@ -138,7 +138,7 @@ public class GoStateTest {
 	  _,_,_,_,_,_,_,_,_
 	  _,_,_,_,_,_,_,_,_
 	*/
-	@DisplayName("Testing, that \"isLegalMove\" method returns false, if move would result in a repetition of the game state.")
+	@DisplayName("Testing, that \"isLegalMove\" method returns false if move would result in repetition of the game state.")
 	@Test
 	public void testIsLegalMoveStateRepeated() {
 		GoState state = new GoState(9);
@@ -273,7 +273,7 @@ public class GoStateTest {
 	}
 	
 	
-	@DisplayName("Testing, that \"makeMove\" correctly handles the end of the game (both player pass)")
+	@DisplayName("Testing, that \"makeMove\" method correctly handles the end of the game (both player pass).")
 	@Test
 	public void testMakeMoveEndGame() {
 		GoState state = new GoState(9); // boardSize here doesn't matter
@@ -294,7 +294,7 @@ public class GoStateTest {
 	    );
 	} // only the last move is illegal
 	
-	@DisplayName("Testing, that \"makeMove\" doesn't allow invalid moves (returns false, game state doesn't change)")
+	@DisplayName("Testing, that \"makeMove\" method doesn't allow invalid moves (returns false, game state doesn't change).")
 	@ParameterizedTest
 	@MethodSource("provideIllegalMoveSequence")
 	public void testMakeMoveInvalidMove(int boardSize, List<Point> illegalMoveSequence) {
@@ -320,7 +320,7 @@ public class GoStateTest {
 	    );
 	} // each move is legal
 	
-	@DisplayName("Testing, that \"makeMove\" handles valid moves correctly (prevStates, changed stone placed)")
+	@DisplayName("Testing, that \"makeMove\" method handles valid moves correctly (prevStates changed, stone placed).")
 	@ParameterizedTest
 	@MethodSource("provideValidMoveSequence")
 	public void testMakeMoveValidMove(int boardSize, List<Point> validMoveSequence) {
@@ -379,17 +379,17 @@ public class GoStateTest {
 	        	""", new Point(7, 5), Stone.BLACK, 5, 0)
 	    );
 	}
-	@DisplayName("Testing, that \"makeMove\" handles captured stones correctly.")
+	@DisplayName("Testing, that \"makeMove\" method handles captured stones correctly.")
 	@ParameterizedTest
 	@MethodSource("provideAlmostCapturedGoStates")
-	public void testMakeMoveCapturedStones(String gameState, Point capturingMove, Stone currentPlayerColor, int expectedBlackCaptured, int expcetedWhiteCaptured) {
+	public void testMakeMoveCapturedStones(String gameState, Point capturingMove, Stone currentPlayerColor, int expectedBlackCaptured, int expectedWhiteCaptured) {
 		GoState state = GoStateParser.parseGoState(gameState);
 		state.turn = currentPlayerColor;
 		state.makeMove(capturingMove); // encircle(capture) oppenent's stones
 		
 		assertAll(
 				() -> assertEquals(expectedBlackCaptured, state.getBlackCaptured()),
-				() -> assertEquals(expcetedWhiteCaptured, state.getWhiteCaptured())
+				() -> assertEquals(expectedWhiteCaptured, state.getWhiteCaptured())
 		);
 	}
 
@@ -405,6 +405,7 @@ public class GoStateTest {
 	  _,_,_,_,_,_,_,_,_
 	  _,_,_,_,_,_,_,_,_
 	*/
+	@DisplayName("Testing, GoState's ability to save a game to a file, and load it correctly.")
 	@Test
 	public void testSaveLoadGame() {
 		GoState originalState = new GoState(9);
