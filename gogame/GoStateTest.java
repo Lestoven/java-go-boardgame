@@ -393,17 +393,7 @@ public class GoStateTest {
 		);
 	}
 
-	
-	static Stream<Arguments> provideGoStates() {
-	    return Stream.of(
-	        Arguments.of(9, List.of(new Point(0, 0), new Point(0, 4), new Point(6, 4))),
-	        Arguments.of(13, List.of(new Point(1, 0), new Point(4, 0), new Point(0, 1), new Point(0, 7), new Point(12, 7))),
-	        Arguments.of(19, List.of(new Point(18, 0), new Point(16, 9), new Point(2, 3), new  Point(18, 5), new Point(0, 0)))
-	    );
-	}
-	
 
-	
 	/*
 	  _,W,_,_,_,_,_,_,_
 	  W,_,_,_,_,_,_,_,_
@@ -418,8 +408,7 @@ public class GoStateTest {
 	@Test
 	public void testSaveLoadGame() {
 		GoState originalState = new GoState(9);
-		GoState readedState;
-		
+
 		originalState.makeMove(new Point(0, 0));
 		originalState.makeMove(new Point(1, 0));
 		originalState.makeMove(new Point(2, 2));
@@ -429,11 +418,11 @@ public class GoStateTest {
 			File file = new File("testSerialization.go");
 			originalState.saveGame(file);
 			
-			readedState = GoState.loadGame(file);
+			GoState inputState = GoState.loadGame(file);
 			assertAll(
-				() -> assertTrue(readedState.equals(originalState)), // this checks the "board" and "turn" fields, as the assignment required
-				() -> assertEquals(readedState.getBlackCaptured(), originalState.getBlackCaptured()),
-				() -> assertEquals(readedState.getWhiteCaptured(), originalState.getWhiteCaptured())
+				() -> assertTrue(inputState.equals(originalState)), // this checks the "board" and "turn" fields, as the assignment required
+				() -> assertEquals(inputState.getBlackCaptured(), originalState.getBlackCaptured()),
+				() -> assertEquals(inputState.getWhiteCaptured(), originalState.getWhiteCaptured())
 			);		
 		} catch (IllegalArgumentException ex) {
 			fail(ex.getMessage());
