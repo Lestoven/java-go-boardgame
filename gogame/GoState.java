@@ -158,25 +158,25 @@ public final class GoState implements Predicate<Point>, Serializable {
 		return board[p.y][p.x];
 	}
 	
-	public static GoState loadGame(File filename) {
+	public static GoState loadGame(File file) {
 		try {
-			try(ObjectInputStream inStream = new ObjectInputStream(new FileInputStream(filename))) {
+			try(ObjectInputStream inStream = new ObjectInputStream(new FileInputStream(file))) {
 				return (GoState) inStream.readObject();
 			}
 		}
 		catch(Exception e) {
-			throw new IllegalArgumentException("Failed to load game file from: %s".formatted(filename));
+			throw new IllegalArgumentException("Failed to load game file from: %s".formatted(file.getName()));
 		}
 	}
 	
-	public void saveGame(File filename) {
+	public void saveGame(File file) {
 		try {
-			try(ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(filename))) {
+			try(ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file))) {
 				outStream.writeObject(this);
 			}
 		}
 		catch(Exception e) {
-			throw new IllegalArgumentException("Failed to save game file to: %s".formatted(filename));
+			throw new IllegalArgumentException("Failed to save game file to: %s".formatted(file.getName()));
 		}
 	}
 	
