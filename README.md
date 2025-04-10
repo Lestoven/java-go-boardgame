@@ -38,19 +38,19 @@ The task was to implement the logic of the traditional **Japanese board game "Go
 - **Java Swing (provided GUI)**
 - **JUnit 5** (for test cases)
 
+---
 
 ## 🖼️ Screenshots
 
 > These screenshots show the running Swing application connected to my Go game logic.
 
-### 9x9 Board Example  
-<img src="images/in_game.jpg" alt="9x9 board" width="400"/>
+<div style="display: flex; gap: 10px; justify-content: center;">
 
-### 9x9 Gameplay Placing Stone  
-<img src="images/in_game2.jpg" alt="9x9 gameplay" width="400"/>
+  <img src="images/in_game.jpg" alt="9x9 board" width="250"/>
+  <img src="images/in_game2.jpg" alt="9x9 gameplay" width="250"/>
+  <img src="images/in_game3.jpg" alt="19x19 gameplay" width="250"/>
 
-### 19x19 Gameplay  
-<img src="images/in_game3.jpg" alt="19x19 gameplay" width="400">
+</div>
 
 ---
 
@@ -66,5 +66,3 @@ Unit tests for:
 - Save/load consistency
 
 JUnit 5 was used to create basic coverage for the above functionality.
-
----
