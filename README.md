@@ -46,9 +46,9 @@ The task was to implement the logic of the traditional **Japanese board game "Go
 
 <div style="display: flex; gap: 10px; justify-content: center;">
 
-  <img src="images/in_game.jpg" alt="9x9 board" width="250"/>
-  <img src="images/in_game2.jpg" alt="9x9 gameplay" width="250"/>
-  <img src="images/in_game3.jpg" alt="19x19 gameplay" width="250"/>
+  <img src="images/in_game.jpg" alt="9x9 board" width="350"/>
+  <img src="images/in_game2.jpg" alt="9x9 gameplay" width="350"/>
+  <img src="images/in_game3.jpg" alt="19x19 gameplay" width="350"/>
 
 </div>
 
